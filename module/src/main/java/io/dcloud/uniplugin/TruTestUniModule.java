@@ -3,6 +3,7 @@ package io.dcloud.uniplugin;
 import android.bluetooth.BluetoothDevice;
 import android.util.Log;
 
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.psp.bluetoothlibrary.BluetoothListener;
 
@@ -10,6 +11,7 @@ import net.sunshow.trutest.client.TruTestClient;
 import net.sunshow.trutest.client.TruTestEvent;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import io.dcloud.feature.uniapp.annotation.UniJSMethod;
@@ -19,21 +21,6 @@ import io.dcloud.feature.uniapp.common.UniModule;
 public class TruTestUniModule extends UniModule {
 
     private final String TAG = TruTestUniModule.class.getName();
-
-    //run ui thread
-    @UniJSMethod(uiThread = true)
-    public void testAsyncFunc(JSONObject options, UniJSCallback callback) {
-        Log.e(TAG, "testAsyncFunc--" + options);
-
-        startDetectNearbyDevices();
-
-        if (callback != null) {
-            JSONObject data = new JSONObject();
-            data.put("code", "success");
-            callback.invoke(data);
-            //callback.invokeAndKeepAlive(data);
-        }
-    }
 
     @UniJSMethod(uiThread = true)
     public void turnOnBluetooth() {
@@ -71,9 +58,9 @@ public class TruTestUniModule extends UniModule {
     }
 
     @UniJSMethod(uiThread = true)
-    public void pairDevice(String deviceAddress, UniJSCallback callback) {
-        Log.e(TAG, "pairDevice");
-        if (TruTestClient.instance.pairDevice(deviceAddress, new BluetoothListener.onDevicePairListener() {
+    public void requestPairDevice(String deviceAddress, UniJSCallback callback) {
+        Log.e(TAG, "requestPairDevice");
+        if (TruTestClient.instance.requestPairDevice(deviceAddress, new BluetoothListener.onDevicePairListener() {
             @Override
             public void onDevicePaired(BluetoothDevice device) {
                 // Paired successful
@@ -109,6 +96,47 @@ public class TruTestUniModule extends UniModule {
                 data.put("code", -1);
                 callback.invoke(data);
             }
+        }
+    }
+
+    @UniJSMethod(uiThread = true)
+    public void unpairDevice(String deviceAddress, UniJSCallback callback) {
+        Log.e(TAG, "unpairDevice");
+        if (TruTestClient.instance.unpairDevice(deviceAddress)) {
+            if (callback != null) {
+                JSONObject data = new JSONObject();
+                data.put("code", 0);
+                callback.invoke(data);
+            }
+        } else {
+            if (callback != null) {
+                JSONObject data = new JSONObject();
+                data.put("code", -1);
+                callback.invoke(data);
+            }
+        }
+    }
+
+    @UniJSMethod(uiThread = true)
+    public void listPairedDevices(UniJSCallback callback) {
+        Log.e(TAG, "listPairedDevices");
+        List<BluetoothDevice> deviceList = TruTestClient.instance.listPairedDevices();
+
+        if (callback != null) {
+            JSONArray array = new JSONArray();
+            if (deviceList != null) {
+                for (BluetoothDevice device : deviceList) {
+                    JSONObject item = new JSONObject();
+                    item.put("address", device.getAddress());
+                    item.put("name", device.getName());
+
+                    array.add(item);
+                }
+            }
+
+            JSONObject data = new JSONObject();
+            data.put("devices", array);
+            callback.invoke(data);
         }
     }
 }

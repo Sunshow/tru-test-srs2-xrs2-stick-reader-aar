@@ -137,8 +137,18 @@ globalEvent.addEventListener('TruTest_BlueToothDevicePairCompleted', function(ev
     // {"paired":true}
     console.log('TruTest_BlueToothDevicePairCompleted: '+JSON.stringify(ev));
 });
-trutest.pairDevice('C2:EA:AA:0F:D0:DA', result => {
+trutest.requestPairDevice('C2:EA:AA:0F:D0:DA', result => {
     // {"code":0} 0=successful, others=failed
     console.log('request pair device: ' + JSON.stringify(result))
+})
+
+trutest.unpairDevice('C2:EA:AA:0F:D0:DA', result => {
+    // {"code":0} 0=successful, others=failed
+    console.log('request pair device: ' + JSON.stringify(result))
+})
+
+trutest.listPairedDevices(result => {
+    // {"devices":[{"name":"vivo TWS 2","address":"CC:81:2A:DD:7C:BC"},{"name":"SRS2 0959","address":"2C:11:65:70:29:79"}]}
+    console.log('list paired devices: ' + JSON.stringify(result))
 })
 ```

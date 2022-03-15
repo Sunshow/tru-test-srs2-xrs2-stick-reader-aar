@@ -1,10 +1,13 @@
 package net.sunshow.trutest.client;
 
+import android.bluetooth.BluetoothDevice;
 import android.content.Context;
 
 import com.psp.bluetoothlibrary.Bluetooth;
 import com.psp.bluetoothlibrary.BluetoothListener;
 import com.psp.bluetoothlibrary.Connection;
+
+import java.util.List;
 
 public class TruTestClient {
 
@@ -49,9 +52,16 @@ public class TruTestClient {
         bluetooth.startDetectNearbyDevices();
     }
 
-    public boolean pairDevice(String deviceAddress, BluetoothListener.onDevicePairListener listener) {
+    public boolean requestPairDevice(String deviceAddress, BluetoothListener.onDevicePairListener listener) {
         bluetooth.setOnDevicePairListener(listener);
         return bluetooth.requestPairDevice(deviceAddress);
     }
 
+    public boolean unpairDevice(String deviceAddress) {
+        return bluetooth.unpairDevice(deviceAddress);
+    }
+
+    public List<BluetoothDevice> listPairedDevices() {
+        return bluetooth.getPairedDevices();
+    }
 }
