@@ -14,7 +14,7 @@ git submodule update --init --recursive
 
 ```groovy
 include ':Tru-Test'
-project(":Tru-Test").projectDir = File(settingsDir, "./Tru-Test/module")
+project(':Tru-Test').projectDir = new File('./Tru-Test/module')
 ```
 
 
