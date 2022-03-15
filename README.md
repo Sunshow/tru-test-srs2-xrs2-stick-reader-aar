@@ -123,10 +123,22 @@ const trutest = uni.requireNativePlugin('TruTest')
 
 const globalEvent = uni.requireNativePlugin('globalEvent');
 
+trutest.turnOffBluetooth()
+
+trutest.turnOnBluetooth()
+
 globalEvent.addEventListener('TruTest_BlueToothDeviceDetected', function(ev) {
     // {"device":{"name":"I_TL","address":"C2:EA:AA:0F:D0:DA"}}
     console.log('TruTest_BlueToothDeviceDetected: ' + JSON.stringify(ev));
 });
-
 trutest.startDetectNearbyDevices()
+
+globalEvent.addEventListener('TruTest_BlueToothDevicePairCompleted', function(ev) {
+    // {"paired":true}
+    console.log('TruTest_BlueToothDevicePairCompleted: '+JSON.stringify(ev));
+});
+trutest.pairDevice('C2:EA:AA:0F:D0:DA', result => {
+    // {"code":0} 0=successful, others=failed
+    console.log('request pair device: ' + JSON.stringify(result))
+})
 ```

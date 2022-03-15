@@ -69,4 +69,46 @@ public class TruTestUniModule extends UniModule {
             }
         });
     }
+
+    @UniJSMethod(uiThread = true)
+    public void pairDevice(String deviceAddress, UniJSCallback callback) {
+        Log.e(TAG, "pairDevice");
+        if (TruTestClient.instance.pairDevice(deviceAddress, new BluetoothListener.onDevicePairListener() {
+            @Override
+            public void onDevicePaired(BluetoothDevice device) {
+                // Paired successful
+                Log.e(TAG, device.getName() + " Paired successful");
+
+                Map<String, Object> params = new HashMap<>();
+
+                params.put("paired", true);
+
+                mUniSDKInstance.fireGlobalEventCallback(TruTestEvent.BlueToothDevicePairCompleted, params);
+            }
+
+            @Override
+            public void onCancelled(BluetoothDevice device) {
+                // Pairing failed
+                Log.e(TAG, device.getName() + " Pairing failed");
+
+                Map<String, Object> params = new HashMap<>();
+
+                params.put("paired", false);
+
+                mUniSDKInstance.fireGlobalEventCallback(TruTestEvent.BlueToothDevicePairCompleted, params);
+            }
+        })) {
+            if (callback != null) {
+                JSONObject data = new JSONObject();
+                data.put("code", 0);
+                callback.invoke(data);
+            }
+        } else {
+            if (callback != null) {
+                JSONObject data = new JSONObject();
+                data.put("code", -1);
+                callback.invoke(data);
+            }
+        }
+    }
 }

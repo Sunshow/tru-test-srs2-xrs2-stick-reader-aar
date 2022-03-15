@@ -49,4 +49,9 @@ public class TruTestClient {
         bluetooth.startDetectNearbyDevices();
     }
 
+    public boolean pairDevice(String deviceAddress, BluetoothListener.onDevicePairListener listener) {
+        bluetooth.setOnDevicePairListener(listener);
+        return bluetooth.requestPairDevice(deviceAddress);
+    }
+
 }
