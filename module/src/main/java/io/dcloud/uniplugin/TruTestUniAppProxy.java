@@ -1,18 +1,15 @@
 package io.dcloud.uniplugin;
 
-import android.annotation.SuppressLint;
 import android.app.Application;
-import android.content.Context;
 import android.util.Log;
+
+import net.sunshow.trutest.uniapp.TruTestClient;
 
 import io.dcloud.feature.uniapp.UniAppHookProxy;
 
 public class TruTestUniAppProxy implements UniAppHookProxy {
 
     private final String TAG = TruTestUniAppProxy.class.getName();
-
-    @SuppressLint("StaticFieldLeak")
-    static Context context;
 
     @Override
     public void onSubProcessCreate(Application application) {
@@ -22,6 +19,6 @@ public class TruTestUniAppProxy implements UniAppHookProxy {
     @Override
     public void onCreate(Application application) {
         Log.e(TAG, "onCreate");
-        context = application.getApplicationContext();
+        TruTestClient.init(application.getApplicationContext());
     }
 }
