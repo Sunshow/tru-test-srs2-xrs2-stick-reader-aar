@@ -1,4 +1,4 @@
-package net.sunshow.trutest.uniapp;
+package io.dcloud.uniplugin;
 
 import android.annotation.SuppressLint;
 import android.app.Application;
