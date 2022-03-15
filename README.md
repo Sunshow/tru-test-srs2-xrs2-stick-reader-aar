@@ -4,6 +4,8 @@ Android SDK for Tru-Test SRS2/XRS2 Stick Reader
 
 ## Usage in UniAPP (Android)
 
+See reference of [UniAPP NativePlugin](https://nativesupport.dcloud.net.cn/NativePlugin/course/android). 
+
 ### Import as GIT module
 
 ```bash

@@ -1,11 +1,13 @@
 package io.dcloud.uniplugin;
 
 import android.bluetooth.BluetoothDevice;
+import android.bluetooth.BluetoothSocket;
 import android.util.Log;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.psp.bluetoothlibrary.BluetoothListener;
+import com.psp.bluetoothlibrary.Connection;
 
 import net.sunshow.trutest.client.TruTestClient;
 import net.sunshow.trutest.client.TruTestEvent;
@@ -137,6 +139,83 @@ public class TruTestUniModule extends UniModule {
             JSONObject data = new JSONObject();
             data.put("devices", array);
             callback.invoke(data);
+        }
+    }
+
+    @UniJSMethod(uiThread = true)
+    public void isConnected(UniJSCallback callback) {
+        Log.e(TAG, "isConnected");
+        if (callback != null) {
+            JSONObject data = new JSONObject();
+            data.put("connected", TruTestClient.instance.isConnected());
+            callback.invoke(data);
+        }
+    }
+
+    @UniJSMethod(uiThread = true)
+    public void startConnection(JSONObject options, UniJSCallback callback) {
+        Log.e(TAG, "startConnection: " + options);
+        String deviceAddress = options.getString("address");
+        if (TruTestClient.instance.startConnection(deviceAddress, new BluetoothListener.onConnectionListener() {
+            @Override
+            public void onConnectionStateChanged(BluetoothSocket socket, int state) {
+                switch (state) {
+                    case Connection.CONNECTING: {
+                        Log.e(TAG, "Connecting...");
+
+                        Map<String, Object> params = new HashMap<>();
+                        mUniSDKInstance.fireGlobalEventCallback(TruTestEvent.DeviceConnecting, params);
+                        break;
+                    }
+                    case Connection.CONNECTED: {
+                        Log.e(TAG, "Connected");
+
+                        Map<String, Object> params = new HashMap<>();
+                        mUniSDKInstance.fireGlobalEventCallback(TruTestEvent.DeviceConnected, params);
+                        break;
+                    }
+                    case Connection.DISCONNECTED: {
+                        Log.e(TAG, "Disconnected");
+                        // make sure call after detect bluetooth device disconnected
+                        TruTestClient.instance.disconnect();
+
+                        Map<String, Object> params = new HashMap<>();
+                        mUniSDKInstance.fireGlobalEventCallback(TruTestEvent.DeviceDisconnected, params);
+                        break;
+                    }
+                }
+            }
+
+            @Override
+            public void onConnectionFailed(int errorCode) {
+                switch (errorCode) {
+                    case Connection.SOCKET_NOT_FOUND: {
+                        Log.e(TAG, "Socket not found");
+                        break;
+                    }
+                    case Connection.CONNECT_FAILED: {
+                        Log.e(TAG, "Connect Failed");
+                        break;
+                    }
+                }
+                // make sure call after detect onConnectionFailed
+                TruTestClient.instance.disconnect();
+
+                Map<String, Object> params = new HashMap<>();
+                mUniSDKInstance.fireGlobalEventCallback(TruTestEvent.DeviceConnectionFailed, params);
+            }
+        })) {
+            if (callback != null) {
+                JSONObject data = new JSONObject();
+                data.put("code", 0);
+                callback.invoke(data);
+            }
+        } else {
+            if (callback != null) {
+                JSONObject data = new JSONObject();
+                data.put("code", -1);
+                callback.invoke(data);
+            }
         }
     }
 }

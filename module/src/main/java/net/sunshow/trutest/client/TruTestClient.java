@@ -17,6 +17,8 @@ public class TruTestClient {
 
     private Connection connection;
 
+    private TruTestProtocol protocol;
+
     public static TruTestClient instance = new TruTestClient();
 
     private TruTestClient() {
@@ -63,5 +65,24 @@ public class TruTestClient {
 
     public List<BluetoothDevice> listPairedDevices() {
         return bluetooth.getPairedDevices();
+    }
+
+    public boolean isConnected() {
+        return connection.isConnected();
+    }
+
+    public boolean startConnection(String deviceAddress, BluetoothListener.onConnectionListener listener) {
+        if (connection.connect(deviceAddress, false, listener, TruTestProtocol.receiveListener)) {
+            protocol = new TruTestProtocol(connection);
+            return true;
+        }
+        return false;
+    }
+
+    public void disconnect() {
+        if (connection.isConnected()) {
+            connection.disconnect();
+        }
+        protocol = null;
     }
 }
