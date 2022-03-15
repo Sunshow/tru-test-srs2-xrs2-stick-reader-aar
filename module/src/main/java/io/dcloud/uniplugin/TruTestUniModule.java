@@ -6,7 +6,6 @@ import android.util.Log;
 import com.alibaba.fastjson.JSONObject;
 import com.psp.bluetoothlibrary.BluetoothListener;
 
-import net.sunshow.trutest.client.NearbyDevice;
 import net.sunshow.trutest.client.TruTestClient;
 import net.sunshow.trutest.client.TruTestEvent;
 
@@ -61,11 +60,11 @@ public class TruTestUniModule extends UniModule {
 
                 Map<String, Object> params = new HashMap<>();
 
-                NearbyDevice nearbyDevice = new NearbyDevice();
-                nearbyDevice.setAddress(device.getAddress());
-                nearbyDevice.setName(device.getName());
+                JSONObject data = new JSONObject();
+                data.put("address", device.getAddress());
+                data.put("name", device.getName());
 
-                params.put("device", nearbyDevice);
+                params.put("device", data);
                 mUniSDKInstance.fireGlobalEventCallback(TruTestEvent.BlueToothDeviceDetected, params);
             }
         });

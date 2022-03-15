@@ -89,6 +89,10 @@ function checkPermissions(permissions) {
     return true;
 }
 
+function doYourThing() {
+    // do sth.
+}
+
 function requestPermissions(permissions) {
     if (Build.VERSION.SDK_INT >= 23) {
         plus.android.requestPermissions(permissions, function(e) {
@@ -111,10 +115,6 @@ if (!checkPermissions(permissions)) {
 } else {
     doYourThing()
 }
-
-function doYourThing() {
-    // do sth.
-}
 ```
 
 #### Samples
@@ -124,6 +124,7 @@ const trutest = uni.requireNativePlugin('TruTest')
 const globalEvent = uni.requireNativePlugin('globalEvent');
 
 globalEvent.addEventListener('TruTest_BlueToothDeviceDetected', function(ev) {
+    // {"device":{"name":"I_TL","address":"C2:EA:AA:0F:D0:DA"}}
     console.log('TruTest_BlueToothDeviceDetected: ' + JSON.stringify(ev));
 });
 
