@@ -6,16 +6,7 @@ Android SDK for Tru-Test SRS2/XRS2 Stick Reader
 ### Import as GIT module
 
 ```bash
-touch .gitmodules
-```
-
-```
-[submodule "Tru-Test"]
-	path = Tru-Test
-	url = git@github.com:Sunshow/tru-test-srs2-xrs2-stick-reader-aar
-```
-
-```bash
+git submodule add git@github.com:Sunshow/tru-test-srs2-xrs2-stick-reader-aar.git Tru-Test
 git submodule update --init --recursive
 ```
 
@@ -23,6 +14,7 @@ git submodule update --init --recursive
 
 ```groovy
 include ':Tru-Test'
+project(":Tru-Test").projectDir = File(settingsDir, "./Tru-Test/module")
 ```
 
 
