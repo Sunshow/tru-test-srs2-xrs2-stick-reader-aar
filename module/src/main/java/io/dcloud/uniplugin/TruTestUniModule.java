@@ -1,10 +1,17 @@
 package io.dcloud.uniplugin;
 
+import android.bluetooth.BluetoothDevice;
 import android.util.Log;
 
 import com.alibaba.fastjson.JSONObject;
+import com.psp.bluetoothlibrary.BluetoothListener;
 
-import net.sunshow.trutest.uniapp.TruTestClient;
+import net.sunshow.trutest.client.NearbyDevice;
+import net.sunshow.trutest.client.TruTestClient;
+import net.sunshow.trutest.client.TruTestEvent;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import io.dcloud.feature.uniapp.annotation.UniJSMethod;
 import io.dcloud.feature.uniapp.bridge.UniJSCallback;
@@ -18,6 +25,8 @@ public class TruTestUniModule extends UniModule {
     @UniJSMethod(uiThread = true)
     public void testAsyncFunc(JSONObject options, UniJSCallback callback) {
         Log.e(TAG, "testAsyncFunc--" + options);
+
+        startDetectNearbyDevices();
 
         if (callback != null) {
             JSONObject data = new JSONObject();
@@ -39,5 +48,26 @@ public class TruTestUniModule extends UniModule {
         Log.e(TAG, "turnOffBluetooth");
 
         TruTestClient.instance.turnOffBluetooth();
+    }
+
+    @UniJSMethod(uiThread = true)
+    public void startDetectNearbyDevices() {
+        Log.e(TAG, "startDetectNearbyDevices");
+        TruTestClient.instance.startDetectNearbyDevices(new BluetoothListener.onDetectNearbyDeviceListener() {
+            @Override
+            public void onDeviceDetected(BluetoothDevice device) {
+                // Device found
+                Log.e(TAG, "Device found: " + device.getName());
+
+                Map<String, Object> params = new HashMap<>();
+
+                NearbyDevice nearbyDevice = new NearbyDevice();
+                nearbyDevice.setAddress(device.getAddress());
+                nearbyDevice.setName(device.getName());
+
+                params.put("device", nearbyDevice);
+                mUniSDKInstance.fireGlobalEventCallback(TruTestEvent.BlueToothDeviceDetected, params);
+            }
+        });
     }
 }
