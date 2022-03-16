@@ -4,6 +4,7 @@ public enum TruTestError {
 
     OK(0, "^"),
     Unknown(-1, ""),
+    CommandCouldNotBeSent(-2, ""),
     CommandCouldNotBeExecutedAtThisTime(1, "(14)"),
     ;
 

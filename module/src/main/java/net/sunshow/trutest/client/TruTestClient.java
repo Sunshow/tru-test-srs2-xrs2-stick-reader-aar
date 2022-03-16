@@ -8,6 +8,7 @@ import com.psp.bluetoothlibrary.Bluetooth;
 import com.psp.bluetoothlibrary.BluetoothListener;
 import com.psp.bluetoothlibrary.Connection;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class TruTestClient {
@@ -116,11 +117,32 @@ public class TruTestClient {
         protocol = null;
     }
 
-    public boolean requestClearAllSessionFiles(TruTestProtocol.onCommandCompletedListener listener) {
+    public boolean requestClearAllSessionFiles(TruTestProtocol.onCommandCompletedListener<String> listener) {
         return protocol.clearAllSessionFiles(listener);
     }
 
-    public boolean requestResetCurrentSessionData(TruTestProtocol.onCommandCompletedListener listener) {
+    public boolean requestResetCurrentSessionData(TruTestProtocol.onCommandCompletedListener<String> listener) {
         return protocol.resetCurrentSessionData(listener);
+    }
+
+    public boolean requestDownloadCurrentSessionData(final TruTestProtocol.onCommandCompletedListener<List<String>> listener) {
+        return protocol.downloadCurrentSessionData(new TruTestProtocol.onCommandCompletedListener<String>() {
+            @Override
+            public void onCompleted(TruTestCommand command, String data) {
+                List<String> result = new ArrayList<>();
+                String[] lines = data.split("\\]\\[");
+                for (String line : lines) {
+                    // [0,991 005002562568,,16/03/2022,12:22:28]
+                    String[] fields = line.split(",");
+                    result.add(fields[1].replaceAll(" ", ""));
+                }
+                listener.onCompleted(command, result);
+            }
+
+            @Override
+            public void onFailed(TruTestCommand command, TruTestError error) {
+                listener.onFailed(command, error);
+            }
+        });
     }
 }

@@ -156,6 +156,7 @@ trutest.listPairedDevices(result => {
 
 
 globalEvent.addEventListener('TruTest_CommandExecutionCompleted', function(ev) {
+    // {"command":"GetSessionRecord","error":0,"data":["991005002562568","991005002562577","991005002562569","900081001156906","991005002562572"]}
     console.log('TruTest_CommandExecutionCompleted: '+JSON.stringify(ev));
 });
 globalEvent.addEventListener('TruTest_DeviceConnected', function(ev) {
@@ -167,6 +168,10 @@ globalEvent.addEventListener('TruTest_DeviceConnected', function(ev) {
 
     trutest.requestResetCurrentSessionData(result => {
         console.log('request reset current session data: ' + JSON.stringify(result))
+    })
+    
+    trutest.requestDownloadCurrentSessionData(result => {
+        console.log('request download current session data: ' + JSON.stringify(result))
     })
 })
 

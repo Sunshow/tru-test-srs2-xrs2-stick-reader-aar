@@ -222,9 +222,9 @@ public class TruTestUniModule extends UniModule {
         }
     }
 
-    private final TruTestProtocol.onCommandCompletedListener onCommandCompletedListener = new TruTestProtocol.onCommandCompletedListener() {
+    private final TruTestProtocol.onCommandCompletedListener<String> onCommandCompletedListener = new TruTestProtocol.onCommandCompletedListener<String>() {
         @Override
-        public void onCompleted(TruTestCommand command, Object data) {
+        public void onCompleted(TruTestCommand command, String data) {
             Map<String, Object> params = new HashMap<>();
             params.put("command", command.name());
             params.put("error", TruTestError.OK.getValue());
@@ -262,6 +262,41 @@ public class TruTestUniModule extends UniModule {
     public void requestResetCurrentSessionData(UniJSCallback callback) {
         Log.e(TAG, "requestResetCurrentSessionData");
         if (TruTestClient.instance.requestResetCurrentSessionData(onCommandCompletedListener)) {
+            if (callback != null) {
+                JSONObject data = new JSONObject();
+                data.put("code", 0);
+                callback.invoke(data);
+            }
+        } else {
+            if (callback != null) {
+                JSONObject data = new JSONObject();
+                data.put("code", -1);
+                callback.invoke(data);
+            }
+        }
+    }
+
+    @UniJSMethod(uiThread = true)
+    public void requestDownloadCurrentSessionData(UniJSCallback callback) {
+        Log.e(TAG, "requestDownloadCurrentSessionData");
+        if (TruTestClient.instance.requestDownloadCurrentSessionData(new TruTestProtocol.onCommandCompletedListener<List<String>>() {
+            @Override
+            public void onCompleted(TruTestCommand command, List<String> data) {
+                Map<String, Object> params = new HashMap<>();
+                params.put("command", command.name());
+                params.put("error", TruTestError.OK.getValue());
+                params.put("data", data);
+                mUniSDKInstance.fireGlobalEventCallback(TruTestEvent.CommandExecutionCompleted, params);
+            }
+
+            @Override
+            public void onFailed(TruTestCommand command, TruTestError error) {
+                Map<String, Object> params = new HashMap<>();
+                params.put("command", command.name());
+                params.put("error", error.getValue());
+                mUniSDKInstance.fireGlobalEventCallback(TruTestEvent.CommandExecutionCompleted, params);
+            }
+        })) {
             if (callback != null) {
                 JSONObject data = new JSONObject();
                 data.put("code", 0);

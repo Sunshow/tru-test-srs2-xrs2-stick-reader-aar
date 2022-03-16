@@ -11,6 +11,12 @@ public enum TruTestCommand {
     // Clears life data or currently selected session.
     ResetCurrentSessionData("{FC}"),
 
+    // Operate on session data
+    OperateOnSessionData("{FGDD}"),
+
+    // Send {FN} repeatedly to get each record. An empty response [] means there are no more records
+    GetSessionRecord("{FN}"),
+
     ;
 
     private final String code;
