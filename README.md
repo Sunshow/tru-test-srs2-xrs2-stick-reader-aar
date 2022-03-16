@@ -153,4 +153,25 @@ trutest.listPairedDevices(result => {
     // {"devices":[{"name":"vivo TWS 2","address":"CC:81:2A:DD:7C:BC"},{"name":"SRS2 0959","address":"2C:11:65:70:29:79"}]}
     console.log('list paired devices: ' + JSON.stringify(result))
 })
+
+
+globalEvent.addEventListener('TruTest_CommandExecutionCompleted', function(ev) {
+    console.log('TruTest_CommandExecutionCompleted: '+JSON.stringify(ev));
+});
+globalEvent.addEventListener('TruTest_DeviceConnected', function(ev) {
+    console.log('TruTest_DeviceConnected: '+JSON.stringify(ev));
+
+    trutest.requestClearAllSessionFiles(result => {
+        console.log('request clear all session files: ' + JSON.stringify(result))
+    })
+
+    trutest.requestResetCurrentSessionData(result => {
+        console.log('request reset current session data: ' + JSON.stringify(result))
+    })
+})
+
+trutest.startConnection({'address': '2C:11:65:70:29:79'}, result => {
+    console.log('start connection: ' + JSON.stringify(result))
+})
+
 ```

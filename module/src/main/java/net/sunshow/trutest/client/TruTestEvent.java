@@ -13,5 +13,6 @@ public abstract class TruTestEvent {
     public final static String DeviceDisconnected = "TruTest_DeviceDisconnected";
 
     public final static String DeviceConnectionFailed = "TruTest_DeviceConnectionFailed";
-    
+
+    public final static String CommandExecutionCompleted = "TruTest_CommandExecutionCompleted";
 }

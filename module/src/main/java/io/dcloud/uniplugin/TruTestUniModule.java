@@ -10,7 +10,10 @@ import com.psp.bluetoothlibrary.BluetoothListener;
 import com.psp.bluetoothlibrary.Connection;
 
 import net.sunshow.trutest.client.TruTestClient;
+import net.sunshow.trutest.client.TruTestCommand;
+import net.sunshow.trutest.client.TruTestError;
 import net.sunshow.trutest.client.TruTestEvent;
+import net.sunshow.trutest.client.TruTestProtocol;
 
 import java.util.HashMap;
 import java.util.List;
@@ -205,6 +208,60 @@ public class TruTestUniModule extends UniModule {
                 mUniSDKInstance.fireGlobalEventCallback(TruTestEvent.DeviceConnectionFailed, params);
             }
         })) {
+            if (callback != null) {
+                JSONObject data = new JSONObject();
+                data.put("code", 0);
+                callback.invoke(data);
+            }
+        } else {
+            if (callback != null) {
+                JSONObject data = new JSONObject();
+                data.put("code", -1);
+                callback.invoke(data);
+            }
+        }
+    }
+
+    private final TruTestProtocol.onCommandCompletedListener onCommandCompletedListener = new TruTestProtocol.onCommandCompletedListener() {
+        @Override
+        public void onCompleted(TruTestCommand command, Object data) {
+            Map<String, Object> params = new HashMap<>();
+            params.put("command", command.name());
+            params.put("error", TruTestError.OK.getValue());
+            mUniSDKInstance.fireGlobalEventCallback(TruTestEvent.CommandExecutionCompleted, params);
+        }
+
+        @Override
+        public void onFailed(TruTestCommand command, TruTestError error) {
+            Map<String, Object> params = new HashMap<>();
+            params.put("command", command.name());
+            params.put("error", error.getValue());
+            mUniSDKInstance.fireGlobalEventCallback(TruTestEvent.CommandExecutionCompleted, params);
+        }
+    };
+
+    @UniJSMethod(uiThread = true)
+    public void requestClearAllSessionFiles(UniJSCallback callback) {
+        Log.e(TAG, "requestClearAllSessionFiles");
+        if (TruTestClient.instance.requestClearAllSessionFiles(onCommandCompletedListener)) {
+            if (callback != null) {
+                JSONObject data = new JSONObject();
+                data.put("code", 0);
+                callback.invoke(data);
+            }
+        } else {
+            if (callback != null) {
+                JSONObject data = new JSONObject();
+                data.put("code", -1);
+                callback.invoke(data);
+            }
+        }
+    }
+
+    @UniJSMethod(uiThread = true)
+    public void requestResetCurrentSessionData(UniJSCallback callback) {
+        Log.e(TAG, "requestResetCurrentSessionData");
+        if (TruTestClient.instance.requestResetCurrentSessionData(onCommandCompletedListener)) {
             if (callback != null) {
                 JSONObject data = new JSONObject();
                 data.put("code", 0);

@@ -1,6 +1,7 @@
 package net.sunshow.trutest.client;
 
 import android.bluetooth.BluetoothDevice;
+import android.bluetooth.BluetoothSocket;
 import android.content.Context;
 
 import com.psp.bluetoothlibrary.Bluetooth;
@@ -71,9 +72,38 @@ public class TruTestClient {
         return connection.isConnected();
     }
 
-    public boolean startConnection(String deviceAddress, BluetoothListener.onConnectionListener listener) {
-        if (connection.connect(deviceAddress, false, listener, TruTestProtocol.receiveListener)) {
-            protocol = new TruTestProtocol(connection);
+    public boolean startConnection(String deviceAddress, final BluetoothListener.onConnectionListener listener) {
+        final TruTestProtocol protocol = new TruTestProtocol(connection);
+        if (connection.connect(deviceAddress, false, new BluetoothListener.onConnectionListener() {
+            @Override
+            public void onConnectionStateChanged(final BluetoothSocket socket, final int state) {
+                if (state == Connection.CONNECTED) {
+                    if (!protocol.setAcknowledgeOn(new TruTestProtocol.onCommandCompletedListener() {
+                        @Override
+                        public void onCompleted(TruTestCommand command, Object data) {
+                            listener.onConnectionStateChanged(socket, state);
+                        }
+
+                        @Override
+                        public void onFailed(TruTestCommand command, TruTestError error) {
+                            disconnect();
+                            listener.onConnectionStateChanged(socket, Connection.DISCONNECTED);
+                        }
+                    })) {
+                        disconnect();
+                        listener.onConnectionStateChanged(socket, Connection.DISCONNECTED);
+                    }
+                    return;
+                }
+                listener.onConnectionStateChanged(socket, state);
+            }
+
+            @Override
+            public void onConnectionFailed(int errorCode) {
+                listener.onConnectionFailed(errorCode);
+            }
+        }, protocol.receiveListener)) {
+            this.protocol = protocol;
             return true;
         }
         return false;
@@ -84,5 +114,13 @@ public class TruTestClient {
             connection.disconnect();
         }
         protocol = null;
+    }
+
+    public boolean requestClearAllSessionFiles(TruTestProtocol.onCommandCompletedListener listener) {
+        return protocol.clearAllSessionFiles(listener);
+    }
+
+    public boolean requestResetCurrentSessionData(TruTestProtocol.onCommandCompletedListener listener) {
+        return protocol.resetCurrentSessionData(listener);
     }
 }
