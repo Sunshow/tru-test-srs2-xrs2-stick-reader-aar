@@ -79,9 +79,9 @@ public class TruTestClient {
             @Override
             public void onConnectionStateChanged(final BluetoothSocket socket, final int state) {
                 if (state == Connection.CONNECTED) {
-                    if (!protocol.setAcknowledgeOn(new TruTestProtocol.onCommandCompletedListener() {
+                    if (!protocol.setAcknowledgeOn(new TruTestProtocol.onCommandCompletedListener<String>() {
                         @Override
-                        public void onCompleted(TruTestCommand command, Object data) {
+                        public void onCompleted(TruTestCommand command, String data) {
                             listener.onConnectionStateChanged(socket, state);
                         }
 
