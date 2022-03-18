@@ -23,6 +23,10 @@ public class TruTestProtocol {
 
     private StringBuilder received;
 
+    private boolean realTimeScanning;
+
+    private onRealTimeDataScannedListener realTimeDataScannedListener;
+
     public TruTestProtocol(Connection connection) {
         this.connection = connection;
     }
@@ -31,9 +35,27 @@ public class TruTestProtocol {
     public BluetoothListener.onReceiveListener receiveListener = new BluetoothListener.onReceiveListener() {
         @Override
         public void onReceived(String receivedData) {
+            Log.e(TAG, "onReceived: " + receivedData);
+
+            if (realTimeScanning) {
+                if (received == null) {
+                    received = new StringBuilder();
+                }
+                received.append(receivedData);
+                if (received.length() >= 2 && received.charAt(received.length() - 2) == '\r' && received.charAt(received.length() - 1) == '\n') {
+                    if (realTimeDataScannedListener != null) {
+                        realTimeDataScannedListener.onScanned(received.substring(0, received.length() - 2));
+                    }
+                    received = null;
+                }
+                return;
+            }
+
+            if (commandQueue == null) {
+                return;
+            }
             final TruTestCommand current = command;
             final boolean hasNext = !commandQueue.isEmpty();
-            Log.e(TAG, "onReceived: " + receivedData);
             // received an ack
             if (TruTestError.OK.getCode().equals(receivedData)) {
                 if (!hasNext && listener != null) {
@@ -121,6 +143,10 @@ public class TruTestProtocol {
     }
 
     private synchronized boolean execute(List<TruTestCommand> commandList, onCommandCompletedListener<String> listener) {
+        if (this.realTimeScanning) {
+            Log.e(TAG, "Device is in real-time scanning mode, cannot execute other command, stop first.");
+            return false;
+        }
         if (this.commandQueue != null) {
             Log.e(TAG, "Another command is executing or waiting response.");
             return false;
@@ -158,11 +184,28 @@ public class TruTestProtocol {
         return execute(commandList, listener);
     }
 
+    public synchronized void startRealTimeScanning(onRealTimeDataScannedListener listener) {
+        this.realTimeDataScannedListener = listener;
+        this.realTimeScanning = true;
+    }
+
+    public synchronized void stopRealTimeScanning() {
+        this.realTimeDataScannedListener = null;
+        this.realTimeScanning = false;
+    }
+
+
     public interface onCommandCompletedListener<T> {
 
         void onCompleted(TruTestCommand command, T data);
 
         void onFailed(TruTestCommand command, TruTestError error);
+
+    }
+
+    public interface onRealTimeDataScannedListener {
+
+        void onScanned(String data);
 
     }
 

@@ -145,4 +145,17 @@ public class TruTestClient {
             }
         });
     }
+
+    public void startRealTimeScanning(final TruTestProtocol.onRealTimeDataScannedListener listener) {
+        protocol.startRealTimeScanning(new TruTestProtocol.onRealTimeDataScannedListener() {
+            @Override
+            public void onScanned(String data) {
+                listener.onScanned(data.replaceAll(" ", ""));
+            }
+        });
+    }
+
+    public void stopRealTimeScanning() {
+        protocol.stopRealTimeScanning();
+    }
 }

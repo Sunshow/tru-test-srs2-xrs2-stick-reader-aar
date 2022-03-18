@@ -157,8 +157,14 @@ trutest.listPairedDevices(result => {
 
 globalEvent.addEventListener('TruTest_CommandExecutionCompleted', function(ev) {
     // {"command":"GetSessionRecord","error":0,"data":["991005002562568","991005002562577","991005002562569","900081001156906","991005002562572"]}
-    console.log('TruTest_CommandExecutionCompleted: '+JSON.stringify(ev));
+    console.log('TruTest_CommandExecutionCompleted: '+JSON.stringify(ev))
 });
+
+globalEvent.addEventListener('TruTest_RealTimeDataScanned', function(ev) {
+    // {"data":"991005002562572"}
+    console.log('TruTest_RealTimeDataScanned: ' + JSON.stringify(ev))
+})
+
 globalEvent.addEventListener('TruTest_DeviceConnected', function(ev) {
     console.log('TruTest_DeviceConnected: '+JSON.stringify(ev));
 
@@ -172,6 +178,14 @@ globalEvent.addEventListener('TruTest_DeviceConnected', function(ev) {
     
     trutest.requestDownloadCurrentSessionData(result => {
         console.log('request download current session data: ' + JSON.stringify(result))
+    })
+    
+    trutest.startRealTimeScanning(result => {
+        console.log('start real time scanning: ' + JSON.stringify(result))
+    })
+    
+    trutest.stopRealTimeScanning(result => {
+        console.log('start real time scanning: ' + JSON.stringify(result))
     })
 })
 

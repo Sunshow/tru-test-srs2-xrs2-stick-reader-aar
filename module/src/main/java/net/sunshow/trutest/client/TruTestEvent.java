@@ -15,4 +15,6 @@ public abstract class TruTestEvent {
     public final static String DeviceConnectionFailed = "TruTest_DeviceConnectionFailed";
 
     public final static String CommandExecutionCompleted = "TruTest_CommandExecutionCompleted";
+
+    public final static String RealTimeDataScanned = "TruTest_RealTimeDataScanned";
 }

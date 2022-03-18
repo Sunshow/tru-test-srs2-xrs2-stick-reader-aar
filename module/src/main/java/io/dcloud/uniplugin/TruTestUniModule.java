@@ -310,4 +310,33 @@ public class TruTestUniModule extends UniModule {
             }
         }
     }
+
+    @UniJSMethod(uiThread = true)
+    public void startRealTimeScanning(UniJSCallback callback) {
+        Log.e(TAG, "startRealTimeScanning");
+        TruTestClient.instance.startRealTimeScanning(new TruTestProtocol.onRealTimeDataScannedListener() {
+            @Override
+            public void onScanned(String data) {
+                Map<String, Object> params = new HashMap<>();
+                params.put("data", data);
+                mUniSDKInstance.fireGlobalEventCallback(TruTestEvent.RealTimeDataScanned, params);
+            }
+        });
+        if (callback != null) {
+            JSONObject data = new JSONObject();
+            data.put("code", 0);
+            callback.invoke(data);
+        }
+    }
+
+    @UniJSMethod(uiThread = true)
+    public void stopRealTimeScanning(UniJSCallback callback) {
+        Log.e(TAG, "stopRealTimeScanning");
+        TruTestClient.instance.stopRealTimeScanning();
+        if (callback != null) {
+            JSONObject data = new JSONObject();
+            data.put("code", 0);
+            callback.invoke(data);
+        }
+    }
 }
