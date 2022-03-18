@@ -156,6 +156,18 @@ public class TruTestUniModule extends UniModule {
     }
 
     @UniJSMethod(uiThread = true)
+    public void disconnect(UniJSCallback callback) {
+        Log.e(TAG, "disconnect");
+        TruTestClient.instance.disconnect();
+        if (callback != null) {
+            JSONObject data = new JSONObject();
+            data.put("code", 0);
+            callback.invoke(data);
+        }
+    }
+
+
+    @UniJSMethod(uiThread = true)
     public void startConnection(JSONObject options, UniJSCallback callback) {
         Log.e(TAG, "startConnection: " + options);
         String deviceAddress = options.getString("address");
