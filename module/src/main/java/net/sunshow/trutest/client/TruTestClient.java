@@ -132,6 +132,9 @@ public class TruTestClient {
                 List<String> result = new ArrayList<>();
                 String[] lines = data.split("\\]\\[");
                 for (String line : lines) {
+                    if (line.isEmpty()) {
+                        continue;
+                    }
                     // [0,991 005002562568,,16/03/2022,12:22:28]
                     String[] fields = line.split(",");
                     result.add(fields[1].replaceAll(" ", ""));
